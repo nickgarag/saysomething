@@ -1,0 +1,47 @@
+<html>
+  <style type="text/css">
+      textarea {
+      cursor: text;
+      resize: none;
+      width:400px;
+      height:100px
+    }
+  </style>
+  <script type="text/javascript">
+    function clearField() {
+    if(document.getElementById) {
+      document.saysomething.reset();
+    }
+}
+</script>
+  <head>
+    <title>{{ title }} - SaySomething</title>
+  </head>
+  <body>
+    <h1>Say something nice about someone :)</h1>
+    <form action="{{ url_for('home') }}" method="post" name="saysomething">
+      {{ form.hidden_tag() }}
+      <p>
+          {{ form.author.label }}<br>
+          {{ form.author(size=32) }}
+      </p>
+      <p>
+          {{ form.message.label }}<br>
+          {{ form.message }}
+      </p>
+      <p>{{ form.submit() }}</p>
+    </form>
+    {% for message in messages|reverse %}
+      <hr/>
+      <font size="+1">{{ message.message|e }}</font>
+      <br/>
+      <i><font size="-1">By 
+      {% if message.author|length %}
+        {{ message.author|e }}
+      {% else %}
+        Anonymous
+      {% endif %}
+      </font></i>
+    {% endfor %}
+  </body>
+</html>
