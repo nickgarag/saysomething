@@ -1,47 +1,75 @@
-<html>
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <style type="text/css">
       textarea {
+      border: solid 1px #ccc;
       cursor: text;
       resize: none;
       width:400px;
-      height:100px
+      height:100px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
     }
   </style>
-  <script type="text/javascript">
-    function clearField() {
-    if(document.getElementById) {
-      document.saysomething.reset();
-    }
-}
-</script>
   <head>
     <title>{{ title }} - SaySomething</title>
   </head>
-  <body>
-    <h1>Say something nice about someone :)</h1>
-    <form action="{{ url_for('home') }}" method="post" name="saysomething">
-      {{ form.hidden_tag() }}
-      <p>
+  <div class="jumbotron text-center">
+    <h1>Say something nice about {{ subject_name }} :)</h1>
+  </div>
+  <form action="{{ url_for('home') }}" method="post" name="saysomething">
+    {{ form.hidden_tag() }}
+    <div class="container">
+      <div class="col">
+        <div class="col">
           {{ form.author.label }}<br>
           {{ form.author(size=32) }}
-      </p>
-      <p>
+        </div>
+        <div class="col">
           {{ form.message.label }}<br>
           {{ form.message }}
-      </p>
-      <p>{{ form.submit() }}</p>
-    </form>
-    {% for message in messages|reverse %}
-      <hr/>
-      <font size="+1">{{ message.message|e }}</font>
-      <br/>
-      <i><font size="-1">By 
-      {% if message.author|length %}
-        {{ message.author|e }}
-      {% else %}
-        Anonymous
-      {% endif %}
-      </font></i>
-    {% endfor %}
-  </body>
+        </div>
+        <div class="col">
+          {% with flash_messages = get_flashed_messages() %}
+            {% if flash_messages %}
+              {% for message in flash_messages %}
+                <div class="alert alert-danger" role="alert">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+        <div class="col">
+          <input type="submit" class="btn btn-warning" value="Post!">
+        </div>
+      </div>
+    </div>
+  </form>
+  <br/>
+  <div class="container-fluid">
+    <ul class="list-group">
+      {% for message in messages|reverse %}
+        <li class="list-group-item">
+          <font size="+1">{{ message.message|e }}</font>
+          <br/>
+          <i><font size="-1">By 
+          {% if message.author|length %}
+            {{ message.author|e }}
+          {% else %}
+            Anonymous
+          {% endif %}
+          </font>
+          <br/>
+          <font size="-2">
+          {{ message.datetime.strftime('%Y-%m-%d at %H:%M:%S UTC') }}
+          </font></i>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
 </html>
