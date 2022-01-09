@@ -5,34 +5,31 @@ from flask import render_template, redirect, url_for, request, json, flash
 @app.route("/", methods=['GET', 'POST'])
 def home():
   say_something_form = forms.SaySomething()
-  
+  captcha = CAPTCHA.create()
+  messages = models.Comment.query.with_entities(models.Comment.author, models.Comment.message, models.Comment.datetime)
+
   if request.method == 'GET':
-    captcha = CAPTCHA.create()
-    messages = models.Comment.query.with_entities(models.Comment.author, models.Comment.message, models.Comment.datetime)
-    return render_template("home.j2", title="Home", form=say_something_form, messages=messages, subject_name=app.config['SUBJECT_NAME'], captcha=captcha)
+    return render_template("home.j2", title="Home", form=say_something_form, messages=messages, subject_name=app.config['SUBJECT_NAME'], captcha=captcha, retain_author="", retain_message="")
 
   if request.method == 'POST':
     if say_something_form.validate_on_submit():
       c_hash = request.form.get('captcha-hash')
       c_text = request.form.get('captcha-text')
-      if CAPTCHA.verify(c_text, c_hash):
-        author = say_something_form.author.data
-        message = say_something_form.message.data
+      author = say_something_form.author.data
+      message = say_something_form.message.data
+
+      if c_text == "" or CAPTCHA.verify(c_text, c_hash) == False:
+        flash("Captcha Incorrect.")
+      elif CAPTCHA.verify(c_text, c_hash):
         remote_addr = request.remote_addr
-      
         comment = models.Comment(author=author, message=message, remote_addr=remote_addr)
         db.session.add(comment)
         try: 
           db.session.commit()
         except:
-          flash("Something went wrong. Is your message too long?")
-          return redirect(url_for('home'))
-      else:
-          print("captcha bad")
-    return redirect(url_for("home"))
+          flash("Something went wrong.")
 
-  
-
+    return render_template("home.j2", title="Home", form=say_something_form, messages=messages, subject_name=app.config['SUBJECT_NAME'], captcha=captcha, retain_author=author, retain_message=message)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -44,4 +41,3 @@ def login():
   
   return render_template("login.j2", title="Login", form=login_form, subject_name=app.config['SUBJECT_NAME']
   )
-    

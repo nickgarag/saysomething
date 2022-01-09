@@ -1,16 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" >
+<body onload="saysomething.message.value = '{{ retain_message }}'">
   {% include "head.j2" %}
   <form action="{{ url_for('home') }}" method="post" name="saysomething">
     {{ form.hidden_tag() }}
     <div class="container">
       <div class="col">
         <div class="col">
-          {{ form.author.label }}<br>
-          {{ form.author(size=32) }}
+          {{ form.author.label }}
+          <br/>
+          {{ form.author(size=32, value=retain_author) }}
         </div>
         <div class="col">
-          {{ form.message.label }}<br>
+          {{ form.message.label }}
+          <br/>
           {{ form.message }}
         </div>
         <div class="col">
@@ -57,4 +60,5 @@
       {% endfor %}
     </ul>
   </div>
+  </body>
 </html>
